@@ -11,17 +11,11 @@ const {
     createReservation,
     fetchCustomers,
     destroyReservation,
-    fetchReservations
+    fetchReservations,
+    fetchRestaurants
 
 } = require("./db")
 
-const init = async() => {
-    await client.connect()
-    // const response = await createTables()
-    app.listen(PORT, ()=>{
-        console.log(`Hello from port number ${PORT}`)
-    })
-} 
 
 app.post("/api/customers/:id/reservations", async(req, res, next)=>{
     try {
@@ -43,20 +37,42 @@ app.get("/api/customers", async(req, res, next)=>{
 
 app.get("/api/restaurants", async(req, res, next)=>{
     try {
+        res.send(await fetchRestaurants())
+    } catch (error) {
+        next(error)
+    }
+})
+
+app.get("/api/reservations", async(req, res, next)=>{
+    try {
         res.send(await fetchReservations())
     } catch (error) {
         next(error)
     }
 })
 
+
 app.delete("/api/customers/:customer_id/reservations/:id", async(req, res, next)=>{
     try {
         await destroyReservation({customer_id: req.params.customer_id, id: req.params.id})
+        res.sendStatus(204);
     } catch (error) {
         next(error)
     }
 })
 
+app.use((err, req, res, next)=> {
+    res.status(err.status || 500).send({ error: err.message || err});
+});
 
+const init = async() => {
+    await client.connect()
+    await createTables()
+    // const [erin, darcy, catherine, david, addie, kevin]
+    // const response = await createTables()
+    app.listen(PORT, ()=>{
+        console.log(`Hello from port number ${PORT}`)
+    })
+} 
 
 init();
