@@ -3,11 +3,11 @@ const uuid = require("uuid")
 const client = new pg.Client(process.env.DATABASE_URL || "postgres://localhost/acme_reservation_db")
 
 const createTables = async() => {
-    await client.connect()
+     // Cascade ensures any dependent objects are also dropped
     const SQL = `
-        DROP TABLE IF EXISTS customers;
-        DROP TABLE IF EXISTS restaurants;
-        DROP TABLE IF EXISTS reservations;
+        DROP TABLE IF EXISTS customers CASCADE; 
+        DROP TABLE IF EXISTS restaurants CASCADE;
+        DROP TABLE IF EXISTS reservations CASCADE;
         CREATE TABLE customers(
             id UUID PRIMARY KEY,
             name VARCHAR(255) NOT NULL UNIQUE
@@ -21,12 +21,11 @@ const createTables = async() => {
             date DATE NOT NULL,
             party_count INTEGER NOT NULL,
             restaurant_id UUID REFERENCES restaurants(id) NOT NULL,
-            customer_id UUID REFERENCES customer(id) NOT NULL
+            customer_id UUID REFERENCES customers(id) NOT NULL
             
         );
     `;
     await client.query(SQL);
-
 };
 
 const createCustomer = async({name}) => {
@@ -55,7 +54,7 @@ const createReservation = async({date, party_count, restaurant_id, customer_id})
 }
 
 const fetchCustomers = async() => {
-    const SQL = `SELECT * FROM customer`
+    const SQL = `SELECT * FROM customers`
     const response = await client.query(SQL)
     return response.rows
 }
@@ -81,7 +80,6 @@ const fetchReservations = async()=>{
     const response = await client.query(SQL)
     return response.rows
 }
-
 
 module.exports = {
     createTables,

@@ -20,7 +20,7 @@ const {
 app.post("/api/customers/:id/reservations", async(req, res, next)=>{
     try {
         res.status(201).send(await createReservation({
-            customer_id: req. params.customer_id, restaurant_id: req.body.restaurant_id, date: req.body.date, party_count: req.body.party_count,
+            customer_id: req.params.id, restaurant_id: req.body.restaurant_id, date: req.body.date, party_count: req.body.party_count,
         }))
     } catch (error) {
         next(error)
@@ -68,7 +68,16 @@ app.use((err, req, res, next)=> {
 const init = async() => {
     await client.connect()
     await createTables()
-    // const [erin, darcy, catherine, david, addie, kevin]
+    const [erin, darcy, catherine, david, addie] = await Promise.all([
+        createCustomer({name: 'Erin'}),
+        createCustomer({name: 'Darcy'}),
+        createCustomer({name: 'Catherine'}),
+        createCustomer({name: 'David'}),
+        createCustomer({name: 'Addie'}),
+    ])
+    console.log(await fetchCustomers());
+    console.log(await fetchRestaurants());
+
     // const response = await createTables()
     app.listen(PORT, ()=>{
         console.log(`Hello from port number ${PORT}`)
