@@ -1,7 +1,7 @@
 const express = require("express")
 const app = express()
 app.use(express.json())
-const PORT = process.env.PORT || 3000;
+
 
 const {
     createTables,
@@ -105,10 +105,18 @@ const init = async() => {
 
     console.log(await fetchReservations())
     await destroyReservation({id: reservation2.id, customer_id: reservation2.customer_id});
-    
+    console.log(await fetchReservations())
+
+    const PORT = process.env.PORT || 3000;
     // const response = await createTables()
     app.listen(PORT, ()=>{
         console.log(`Hello from port number ${PORT}`)
+        console.log('Some curl commands to test')
+        console.log(`curl localhost: ${PORT}/api/customers`)
+        console.log(`curl localhost: ${PORT}/api/restaurants`)
+        console.log(`curl localhost: ${PORT}/api/reservations`)
+        console.log(`curl -X DELETE localhost: ${PORT}/api/customers/${darcy.id}/reservations/${reservation2.id}`)
+
     })
 } 
 
