@@ -21,6 +21,8 @@ app.post("/api/customers/:id/reservations", async(req, res, next)=>{
     try {
         res.status(201).send(await createReservation({
             customer_id: req.params.id, restaurant_id: req.body.restaurant_id, date: req.body.date, party_count: req.body.party_count,
+            date: req.body.date,
+            party_count: req.body.party_count
         }))
     } catch (error) {
         next(error)
@@ -68,16 +70,42 @@ app.use((err, req, res, next)=> {
 const init = async() => {
     await client.connect()
     await createTables()
-    const [erin, darcy, catherine, david, addie] = await Promise.all([
+    const [erin, darcy, addie, chipotle, mcdonalds, bjs] = await Promise.all([
         createCustomer({name: 'Erin'}),
         createCustomer({name: 'Darcy'}),
-        createCustomer({name: 'Catherine'}),
-        createCustomer({name: 'David'}),
         createCustomer({name: 'Addie'}),
+        createRestaurant({name: 'Chipotle'}),
+        createRestaurant({name: 'Mcdonalds'}),
+        createRestaurant({name: 'Bjs'})
+
     ])
     console.log(await fetchCustomers());
     console.log(await fetchRestaurants());
 
+    const [reservation, reservation2, reservation3] = await Promise.all([
+        createReservation({
+            customer_id: erin.id,
+            restaurant_id: chipotle.id,
+            date: '2024-7-20',
+            party_count: 3
+        }),
+        createReservation({
+            customer_id: darcy.id,
+            restaurant_id: mcdonalds.id,
+            date: '2024-7-25',
+            party_count: 6
+        }),
+        createReservation({
+            customer_id: addie.id,
+            restaurant_id: bjs.id,
+            date: '2024-7-22',
+            party_count: 2
+        }),
+    ])
+
+    console.log(await fetchReservations())
+    await destroyReservation({id: reservation2.id, customer_id: reservation2.customer_id});
+    
     // const response = await createTables()
     app.listen(PORT, ()=>{
         console.log(`Hello from port number ${PORT}`)

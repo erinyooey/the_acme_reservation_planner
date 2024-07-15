@@ -65,12 +65,12 @@ const fetchRestaurants = async() => {
     return response.rows
 }
 
-const destroyReservation = async({restaurant_id, customer_id}) => {
-    console.log(restaurant_id, customer_id)
+const destroyReservation = async({id, customer_id}) => {
+    console.log(id, customer_id)
     const SQL = `
         DELETE FROM reservations WHERE restaurant_id = $1 AND customer_id = $2
     `
-    await client.query(SQL, [restaurant_id, customer_id])
+    await client.query(SQL, [id, customer_id])
 }
 
 const fetchReservations = async()=>{
